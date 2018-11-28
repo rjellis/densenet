@@ -132,27 +132,3 @@ def densenet(input_features, training,
         net = tf.layers.dense(net, num_classes)
 
     return net
-
-
-def main():
-    batch_size, height, width, channels = [32, 256, 512, 1]
-
-    input_pl = tf.placeholder(dtype=tf.float32,
-                              shape=[batch_size, height, width, channels])
-
-    training_pl = tf.placeholder(dtype=tf.bool)
-    logits = densenet(input_pl, training_pl)
-
-    with tf.Session() as sess:
-        sess.run(tf.global_variables_initializer())
-        out = sess.run(logits,
-                       feed_dict={
-                           input_pl: np.random.rand(
-                               batch_size, height, width, channels),
-                           training_pl: True
-                       })
-        print(out)
-
-
-if __name__ == '__main__':
-    main()
