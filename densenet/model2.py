@@ -65,17 +65,17 @@ class DenseNet(Model):
 
         return tf.keras.Sequential([bn1, conv1, avg_pool1])
 
-    def call(self, x):
+    def call(self, x, training=True):
         x = self.conv1(x)
         x = self.max_pool1(x)
         for i in range(len(self.block_config)):
             x_list = [x]
             block = self.blocks[i]
             for layer in block:
-                x = layer()(tf.concat(x_list, -1))
+                x = layer()(tf.concat(x_list, -1), training=training)
                 x_list.append(x)
 
-            x = self.transitions[i](x.shape.as_list()[-1])(x)
+            x = self.transitions[i](x.shape.as_list()[-1])(x, training=training)
             
         x = layers.AveragePooling2D(
                 pool_size=(x.shape.as_list()[1], x.shape.as_list()[2]), 

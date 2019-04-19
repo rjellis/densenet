@@ -3,19 +3,19 @@ from model2 import DenseNet
 
 def convert_types(image, label):
   image = tf.cast(image, tf.float32)
-  # image = tf.expand_dims(image, -1)
+  image = tf.expand_dims(image, -1)
   image /= 255
   return image, label
 
 
 if __name__ == '__main__':
-    (x_train, y_train), (x_test, y_test) = tf.keras.datasets.cifar10.load_data()
+    (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
     mnist_train = tf.data.Dataset.from_tensor_slices((x_train, y_train))
     mnist_test = tf.data.Dataset.from_tensor_slices((x_test, y_test))
     mnist_train = mnist_train.map(convert_types).shuffle(1000).batch(32)
     mnist_test = mnist_test.map(convert_types).batch(32)
     
-    model = DenseNet(block_config=(2, 2, 2))
+    model = DenseNet(block_config=(3, 6, 3))
     loss_object = tf.keras.losses.SparseCategoricalCrossentropy()
     optimizer = tf.keras.optimizers.Adam(lr=1e-1)
     train_loss = tf.keras.metrics.Mean(name='train_loss')
@@ -36,7 +36,7 @@ if __name__ == '__main__':
 
     # @tf.function 
     def test_step(image, label):
-        predictions = model(image)
+        predictions = model(image, training=False)
         t_loss = loss_object(label, predictions)
         test_loss(t_loss)
         test_accuracy(label, predictions)
